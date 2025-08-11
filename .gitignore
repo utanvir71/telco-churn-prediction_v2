@@ -103,6 +103,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+artifact/
 ml_venv/
 .env
 .venv
