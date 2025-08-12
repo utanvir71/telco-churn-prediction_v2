@@ -6,4 +6,5 @@ numpy
 scikit-learn
 imblearn
 xgboost
+dill
 # -e .
