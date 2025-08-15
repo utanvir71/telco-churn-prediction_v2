@@ -7,4 +7,5 @@ scikit-learn
 imblearn
 xgboost
 dill
+Flask
 # -e .
