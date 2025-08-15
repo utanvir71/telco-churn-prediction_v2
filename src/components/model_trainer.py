@@ -96,58 +96,57 @@ class ModelTrainer:
             # Param grids 
             # Keys must match the model names above.
             # ---------------------------
-            # params = {
-            #     "LogisticRegression": {
-            #         "C": [0.1, 1.0, 10.0]
-            #     },
-            #     "RandomForestClassifier": {
-            #         "n_estimators": [100, 200, 400],
-            #         "max_depth": [None, 10, 20]
-            #     },
-            #     "GradientBoostingClassifier": {
-            #         "n_estimators": [100, 200],
-            #         "learning_rate": [0.05, 0.1],
-            #         "max_depth": [2, 3]
-            #     },
-            #     "AdaBoostClassifier": {
-            #         "n_estimators": [100, 300],
-            #         "learning_rate": [0.1, 1.0]
-            #     },
-            #     "SVC": {
-            #         "C": [0.5, 1.0, 2.0],
-            #         "gamma": ["scale", "auto"],
-            #         "kernel": ["rbf"]
-            #     },
-            #     "KNN": {
-            #         "n_neighbors": [3, 5, 7],
-            #         "weights": ["uniform", "distance"]
-            #     },
-            #     "DecisionTreeClassifier": {
-            #         "max_depth": [None, 10, 20],
-            #         "min_samples_split": [2, 10]
-            #     },
-            #     "GaussianNB": {
-            #         # tiny smoothing sweep; cheap
-            #         "var_smoothing": [1e-9, 1e-8, 1e-7]
-            #     },
-            #     "MLPClassifier": {
-            #         "hidden_layer_sizes": [(64,), (128,)],
-            #         "alpha": [1e-4, 1e-3]
-            #     },
-            #     "XGBClassifier": {
-            #         "learning_rate": [0.05, 0.1],
-            #         "max_depth": [3, 5],
-            #         "n_estimators": [200, 300]
-            #     },
-            # }
+            params = {
+                "LogisticRegression": {
+                    "C": [0.1, 1.0, 10.0]
+                },
+                "RandomForestClassifier": {
+                    "n_estimators": [100, 200, 400],
+                    "max_depth": [None, 10, 20]
+                },
+                "GradientBoostingClassifier": {
+                    "n_estimators": [100, 200],
+                    "learning_rate": [0.05, 0.1],
+                    "max_depth": [2, 3]
+                },
+                "AdaBoostClassifier": {
+                    "n_estimators": [100, 300],
+                    "learning_rate": [0.1, 1.0]
+                },
+                "SVC": {
+                    "C": [0.5, 1.0, 2.0],
+                    "gamma": ["scale", "auto"],
+                    "kernel": ["rbf"]
+                },
+                "KNN": {
+                    "n_neighbors": [3, 5, 7],
+                    "weights": ["uniform", "distance"]
+                },
+                "DecisionTreeClassifier": {
+                    "max_depth": [None, 10, 20],
+                    "min_samples_split": [2, 10]
+                },
+                "GaussianNB": {
+                    # tiny smoothing sweep; cheap
+                    "var_smoothing": [1e-9, 1e-8, 1e-7]
+                },
+                "MLPClassifier": {
+                    "hidden_layer_sizes": [(64,), (128,)],
+                    "alpha": [1e-4, 1e-3]
+                },
+                "XGBClassifier": {
+                    "learning_rate": [0.05, 0.1],
+                    "max_depth": [3, 5],
+                    "n_estimators": [200, 300]
+                },
+            }
 
-            # Your course-style evaluator should accept param=params
             logging.info("Evaluating models with course-style evaluator")
             model_report: dict = evaluate_models(
                 X_train=X_train, y_train=y_train,
                 X_test=X_test,   y_test=y_test,
                 models=models, 
-                # param=params
+                param=params
             )
             if not model_report:
                 raise CustomException("evaluate_models returned empty report", sys)

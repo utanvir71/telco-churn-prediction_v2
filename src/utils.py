@@ -7,6 +7,7 @@ import pickle
 
 from src.exception import CustomException
 
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     roc_auc_score, confusion_matrix, classification_report
@@ -34,7 +35,7 @@ def load_object(file_path):
     
 
 
-def evaluate_models(X_train, X_test, y_train, y_test, models):
+def evaluate_models(X_train, X_test, y_train, y_test, models, param):
     """
     Train and evaluate multiple classifiers with error handling.
     Parameters:
@@ -49,20 +50,28 @@ def evaluate_models(X_train, X_test, y_train, y_test, models):
         print(f"\n=== Training & Evaluating: {name} ===")
         
         try:
-            # Train
-            model.fit(X_train, y_train)
+
+            grid = param.get(name,{}) #empty dict if no params
+
+            # GridSearchCV if param porovided
+            if grid:
+                gs = GridSearchCV(model, grid, cv=3, n_jobs=-1, scoring="roc_auc", refit=True)
+                gs.fit(X_train, y_train)
+                est = gs.best_estimator_
+                print(f"[GridSearchCV] best_params for {name}: {gs.best_params_}")
+            else:
+                model.fit(X_train, y_train)
+                est = model
             
             # Predictions
-            y_pred = model.predict(X_test)
+            y_pred = est.predict(X_test)
 
             # Probabilities or decision scores for AUC
             y_score = None
-            if hasattr(model, "predict_proba"):
-                y_score = model.predict_proba(X_test)[:, 1]
-            elif hasattr(model, "decision_function"):
-                s = model.decision_function(X_test)
-                s = (s - s.min()) / (s.max() - s.min() + 1e-12)
-                y_score = s
+            if hasattr(est, "predict_proba"):
+                y_score = est.predict_proba(X_test)[:, 1]
+            elif hasattr(est, "decision_function"):
+                y_score = est
 
             # Metrics
             acc  = accuracy_score(y_test, y_pred)
