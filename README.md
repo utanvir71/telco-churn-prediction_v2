@@ -94,7 +94,7 @@ pip install -r requirements.txt
 ```
 
 
-### 3. Reword install & run for clarity
+### 3. Run Training Pipeline
 ```bash
 python -m src.pipeline.train_pipeline
 ```
@@ -105,16 +105,17 @@ streamlit run streamlit_app.py
 
 
 ## 📦 Dependencies
-pandas
-matplotlib
-seaborn
-numpy
-scikit-learn==1.6.1
-imblearn
-xgboost
-dill
-Flask
-streamlit
+- pandas
+- matplotlib
+- seaborn
+- numpy
+- scikit-learn==1.6.1
+- imblearn
+- xgboost
+- dill
+- Flask
+- streamlit
+- (See `requirements.txt` for full details)
 
 
 ## 📊 Dataset
@@ -134,4 +135,4 @@ MIT - You’re free to use, modify, and share it.
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ---
-🔗 **Connect with me:** [LinkedIn](https://linkedin.com/in/your-link) | [Twitter](https://twitter.com/your-handle)
+🔗 **Connect with me:** [LinkedIn](https://linkedin.com/in/your-link) | [Instagram](https://www.instagram.com/yestanvir)
