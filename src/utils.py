@@ -27,10 +27,10 @@ def save_object(file_path, obj):
 
 
 def load_object(file_path):
-    """Load a pickled Python object from disk."""
+    """Load a Dilled Python object from disk."""
     try:
         with open(file_path, "rb") as file_obj:
-            return pickle.load(file_obj)
+            return dill.load(file_obj)
     except Exception as e:
         raise CustomException(e, sys)
     
@@ -46,6 +46,7 @@ def evaluate_models(X_train, X_test, y_train, y_test, models, param):
         results: dict containing metrics for each successfully evaluated model
     """
     results = {}
+    fitted = {}
 
     for name, model in models.items():
         print(f"\n=== Training & Evaluating: {name} ===")
@@ -72,7 +73,7 @@ def evaluate_models(X_train, X_test, y_train, y_test, models, param):
             if hasattr(est, "predict_proba"):
                 y_score = est.predict_proba(X_test)[:, 1]
             elif hasattr(est, "decision_function"):
-                y_score = est
+                y_score = est.decision_function(X_test)
 
             # Metrics
             acc  = accuracy_score(y_test, y_pred)
@@ -102,9 +103,10 @@ def evaluate_models(X_train, X_test, y_train, y_test, models, param):
                 "auc_roc": auc,
                 "confusion_matrix": cm
             }
+            fitted[name] = est
 
         except Exception as e:
             print(f"[ERROR] {name} failed: {e}")
             results[name] = {"error": str(e)}
 
-    return results
+    return results, fitted

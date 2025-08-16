@@ -142,7 +142,7 @@ class ModelTrainer:
             }
 
             logging.info("Evaluating models with course-style evaluator")
-            model_report: dict = evaluate_models(
+            model_report, fitted = evaluate_models(
                 X_train=X_train, y_train=y_train,
                 X_test=X_test,   y_test=y_test,
                 models=models, 
@@ -152,7 +152,7 @@ class ModelTrainer:
                 raise CustomException("evaluate_models returned empty report", sys)
             
             # Rank by AUC first, f1 as tiebreaker (handles Nan Safely)
-            PRIMARY, FALLBACK = "auc_roc", "f1_socre"
+            PRIMARY, FALLBACK = "auc_roc", "f1_score"
 
             def score_tuple(m:dict):
                 auc = np.nan_to_num(m.get(PRIMARY, np.nan), nan=-1.0)
@@ -177,14 +177,13 @@ class ModelTrainer:
             logging.info(f"Best model: {best_model_name} | score: {best_model_score:.4f}")
 
 
-            best_model = models[best_model_name]
-            best_model.fit(X_train, y_train)
+            best_model = fitted[best_model_name]
             save_object(
                 file_path=self.model_trainer_config.trained_model_file_path,
                 obj=best_model
             )
-            logging.info(f"Saved best model to {self.model_trainer_config.trained_model_file_path}")
-
+            logging.info(f"Saved best model to {self.model_trainer_config.trained_model_file_path} | score: {best_model_score:.4f}")
+            
             return (
                 best_model_score,
                 best_model_name
