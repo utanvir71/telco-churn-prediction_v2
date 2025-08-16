@@ -8,6 +8,9 @@ End-to-end machine learning pipeline for predicting customer churn using the Tel
 Includes preprocessing, model training, evaluation, and deployment via a Streamlit dashboard.
 
 ---
+## 🎥 Demo
+![Streamlit Dashboard Demo](assets/demo.gif)
+
 
 ## 🔧 Features
 
@@ -91,10 +94,31 @@ pip install -r requirements.txt
 ```
 
 
-### 3. Run the Pipeline (preprocess, train, save model & scaler) and 4. Lauch Streamlit Dashboard
+### 3. Reword install & run for clarity
 ```bash
 python -m src.pipeline.train_pipeline
 ```
+### 4. Launch Streamlit Dashboard
+```
+streamlit run streamlit_app.py
+```
+
+5. **Dependencies block** → right now you list + `pip install -r requirements.txt` twice. Just keep it once.
+
+---
+
+### ⚡ My Suggested Final Version Title Block:
+```md
+# 📉 Telco Churn Prediction Dashboard
+
+[![Python](https://img.shields.io/badge/Python-3.10-blue)]()
+[![ML](https://img.shields.io/badge/Machine%20Learning-ScikitLearn%2FXGBoost-orange)]()
+[![Streamlit](https://img.shields.io/badge/Streamlit-Ready-brightgreen)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow)]()
+
+End-to-end machine learning pipeline for predicting customer churn using the Telco dataset.  
+Includes preprocessing, model training, evaluation, and deployment via a **Streamlit dashboard**.
+
 
 ## 📦 Dependencies
 pandas
