@@ -1,16 +1,14 @@
-# Base image
-FROM python:3.10
+# Dockerfile
+FROM python:3.10-slim
 
-# Set working directory
 WORKDIR /app
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy everything
+# Copy the rest of the app (including artifact/*.pkl)
 COPY . /app
 
-# Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Expose port
+# HF exposes 7860 by convention for Spaces
 EXPOSE 7860
 
 # Run Streamlit
