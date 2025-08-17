@@ -100,3 +100,89 @@ if submitted:
 
     except Exception as e:
         st.error(f"Prediction failed: {e}")
+
+
+
+# --- Batch predictions (CSV) ---
+st.markdown("## 📥 Batch predictions (CSV)")
+csv = st.file_uploader("Upload a CSV with the same columns as the form", type=["csv"])
+
+if csv is not None:
+    try:
+        batch_df = pd.read_csv(csv)
+        with st.spinner("Scoring…"):
+            preds, probs = pipe.predict(batch_df)
+
+        out = batch_df.copy()
+        out["churn_pred"] = preds.astype(int)
+        if probs is not None:
+            out["churn_prob"] = probs.astype(float)
+
+        st.success(f"Scored {len(out):,} rows")
+        st.dataframe(out.head(20), use_container_width=True)
+
+        # download
+        st.download_button(
+            "Download predictions CSV",
+            data=out.to_csv(index=False).encode("utf-8"),
+            file_name="churn_predictions.csv",
+            mime="text/csv",
+        )
+    except Exception as e:
+        st.error(f"Batch prediction failed: {e}")
+
+
+
+        # --- Risk distribution ---
+if csv is not None and "churn_prob" in out.columns:
+    st.markdown("## 📊 Churn risk distribution")
+    # simple bins
+    counts, bins = np.histogram(out["churn_prob"], bins=[0,0.2,0.4,0.6,0.8,1.0])
+    dist = pd.DataFrame({"bin": [f"{bins[i]:.1f}–{bins[i+1]:.1f}" for i in range(len(bins)-1)],
+                         "count": counts})
+    st.bar_chart(dist.set_index("bin"))
+
+
+    # --- Feature importance (Permutation Importance) ---
+from sklearn.inspection import permutation_importance
+
+st.markdown("## 🧠 Feature importance (permutation)")
+with st.expander("Compute on a small sample (fast)"):
+    try:
+        # grab a tiny sample from the last uploaded CSV if available,
+        # otherwise build one row from the form to avoid empty data
+        if csv is not None and len(batch_df) > 50:
+            sample = batch_df.sample(min(200, len(batch_df)), random_state=42)
+        else:
+            sample = df.copy()  # the single-row form dataframe
+
+        # use the same preprocessor + model inside your pipeline
+        pre = pipe.preprocessor   # make sure PredictPipeline exposes this
+        clf = pipe.model          # and this
+
+        X = pre.transform(sample)             # numpy array after transforms
+        y_pred = clf.predict(X)               # baseline predictions
+
+        # wrap a callable for permutation_importance
+        def predict_fn(Xnum):
+            return clf.predict_proba(Xnum)[:,1] if hasattr(clf, "predict_proba") else clf.decision_function(Xnum)
+
+        r = permutation_importance(
+            clf, X, y_pred, n_repeats=5, random_state=42, scoring=None
+        )
+
+        # map back to feature names (this works if your preprocessor has get_feature_names_out)
+        try:
+            feat_names = pre.get_feature_names_out()
+        except Exception:
+            feat_names = [f"f{i}" for i in range(X.shape[1])]
+
+        imp_df = pd.DataFrame({"feature": feat_names, "importance": r.importances_mean})
+        imp_df = imp_df.sort_values("importance", ascending=False).head(30)
+
+        st.dataframe(imp_df, use_container_width=True)
+        st.bar_chart(imp_df.set_index("feature"))
+    except AttributeError:
+        st.info("Your PredictPipeline must expose `preprocessor` and `model` to compute importances. Add them and try again.")
+    except Exception as e:
+        st.error(f"Feature importance failed: {e}")
